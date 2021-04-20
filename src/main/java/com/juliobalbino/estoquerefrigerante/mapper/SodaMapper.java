@@ -10,9 +10,9 @@ public interface SodaMapper {
 
     SodaMapper INSTANCE = Mappers.getMapper(SodaMapper.class);
 
-    Soda toModel(SodaDTO SodaDTO);
+    Soda toModel(SodaDTO sodaDTO);
 
-    SodaDTO toDTO(Soda Soda);
+    SodaDTO toDTO(Soda soda);
 
 
 }

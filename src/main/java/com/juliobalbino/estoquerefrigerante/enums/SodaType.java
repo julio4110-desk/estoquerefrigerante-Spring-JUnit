@@ -11,7 +11,7 @@ public enum SodaType {
     LARANJA("Laranja"),
     UVA("Uva"),
     GUARANA("Guarana"),
-    LIMAO("LIMAO");
+    LIMAO("Limao");
 
     private final String description;
 

@@ -15,36 +15,36 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/Sodas")
+@RequestMapping("/api/v1/sodas")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class SodaController implements SodaControllerDocs {
 
-    private final SodaService SodaService;
+    private final SodaService sodaService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SodaDTO createSoda(@RequestBody @Valid SodaDTO SodaDTO) throws SodaAlreadyRegisteredException {
-        return SodaService.createSoda(SodaDTO);
+    public SodaDTO createSoda(@RequestBody @Valid SodaDTO sodaDTO) throws SodaAlreadyRegisteredException {
+        return sodaService.createSoda(sodaDTO);
     }
 
     @GetMapping("/{name}")
     public SodaDTO findByName(@PathVariable String name) throws SodaNotFoundException {
-        return SodaService.findByName(name);
+        return sodaService.findByName(name);
     }
 
     @GetMapping
     public List<SodaDTO> listSodas() {
-        return SodaService.listAll();
+        return sodaService.listAll();
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) throws SodaNotFoundException {
-        SodaService.deleteById(id);
+        sodaService.deleteById(id);
     }
 
     @PatchMapping("/{id}/increment")
     public SodaDTO increment(@PathVariable Long id, @RequestBody @Valid QuantityDTO quantityDTO) throws SodaNotFoundException, SodaStockExceededException {
-        return SodaService.increment(id, quantityDTO.getQuantity());
+        return sodaService.increment(id, quantityDTO.getQuantity());
     }
 }

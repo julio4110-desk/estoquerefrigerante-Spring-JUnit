@@ -23,10 +23,10 @@ public class SodaService {
 
     private final SodaMapper sodaMapper = SodaMapper.INSTANCE;
 
-    public SodaDTO createSoda(SodaDTO SodaDTO) throws SodaAlreadyRegisteredException {
-        verifyIfIsAlreadyRegistered(SodaDTO.getName());
-        Soda Soda = sodaMapper.toModel(SodaDTO);
-        Soda savedSoda = sodaRepository.save(Soda);
+    public SodaDTO createSoda(SodaDTO sodaDTO) throws SodaAlreadyRegisteredException {
+        verifyIfIsAlreadyRegistered(sodaDTO.getName());
+        Soda soda = sodaMapper.toModel(sodaDTO);
+        Soda savedSoda = sodaRepository.save(soda);
         return sodaMapper.toDTO(savedSoda);
     }
 
@@ -62,11 +62,11 @@ public class SodaService {
     }
 
     public SodaDTO increment(Long id, int quantityToIncrement) throws SodaNotFoundException, SodaStockExceededException {
-        Soda SodaToIncrementStock = verifyIfIsExists(id);
-        int quantityAfterIncrement = quantityToIncrement + SodaToIncrementStock.getQuantity();
-        if (quantityAfterIncrement <= SodaToIncrementStock.getMax()) {
-            SodaToIncrementStock.setQuantity(SodaToIncrementStock.getQuantity() + quantityToIncrement);
-            Soda incrementedSodaStock = sodaRepository.save(SodaToIncrementStock);
+        Soda sodaToIncrementStock = verifyIfIsExists(id);
+        int quantityAfterIncrement = quantityToIncrement + sodaToIncrementStock.getQuantity();
+        if (quantityAfterIncrement <= sodaToIncrementStock.getMax()) {
+            sodaToIncrementStock.setQuantity(sodaToIncrementStock.getQuantity() + quantityToIncrement);
+            Soda incrementedSodaStock = sodaRepository.save(sodaToIncrementStock);
             return sodaMapper.toDTO(incrementedSodaStock);
         }
         throw new SodaStockExceededException(id, quantityToIncrement);
