@@ -13,13 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SodaServiceTest {
@@ -91,5 +92,56 @@ public class SodaServiceTest {
 
         // then
         assertThrows(SodaNotFoundException.class, ()->sodaService.findByName(expectedFoundSodaDTO.getName()));
+    }
+
+    @Test
+    void whenListSodaIsCalledThenReturnAListOfSodas() {
+        // given
+        SodaDTO expectedFoundSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedFoundSoda = sodaMapper.toModel(expectedFoundSodaDTO);
+
+        // when
+        when(sodaRepository.findAll()).thenReturn(Collections.singletonList(expectedFoundSoda));
+
+        // then
+        List<SodaDTO> foundListSodasDTO = sodaService.listAll();
+
+        assertThat(foundListSodasDTO, is(not(empty())));
+        assertThat(foundListSodasDTO.get(0), is(equalTo(expectedFoundSodaDTO)));
+    }
+
+    @Test
+    void whenListSodaIsCalledThenReturnAnEmptyListOfSodas() {
+        // when
+        when(sodaRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
+
+        // then
+        List<SodaDTO> foundListSodasDTO = sodaService.listAll();
+
+        assertThat(foundListSodasDTO, is(empty()));
+    }
+
+    @Test
+    void whenExclusionIsCalledWithValidIdThenASodaShouldBeDeleted() throws SodaNotFoundException {
+        // given
+        SodaDTO expectedDeletedSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedDeletedSoda = sodaMapper.toModel(expectedDeletedSodaDTO);
+
+        // when
+        when(sodaRepository.findById(expectedDeletedSodaDTO.getId())).thenReturn(Optional.of(expectedDeletedSoda));
+        doNothing().when(sodaRepository).deleteById(expectedDeletedSodaDTO.getId());
+
+        // then
+        sodaService.deleteById(expectedDeletedSodaDTO.getId());
+
+        verify(sodaRepository, times(1)).findById(expectedDeletedSodaDTO.getId());
+        verify(sodaRepository, times(1)).deleteById(expectedDeletedSodaDTO.getId());
+    }
+
+    @Test
+    void whenExclusionIsCalledWithInvalidIdThenExceptionShouldBeThrown() {
+        when(sodaRepository.findById(INVALID_SODA_ID)).thenReturn(Optional.empty());
+
+        assertThrows(SodaNotFoundException.class, () -> sodaService.deleteById(INVALID_SODA_ID));
     }
 }
