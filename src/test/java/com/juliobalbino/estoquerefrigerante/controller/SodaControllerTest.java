@@ -4,6 +4,7 @@ import com.juliobalbino.estoquerefrigerante.builder.SodaDTOBuilder;
 import com.juliobalbino.estoquerefrigerante.dto.QuantityDTO;
 import com.juliobalbino.estoquerefrigerante.dto.SodaDTO;
 import com.juliobalbino.estoquerefrigerante.exception.SodaNotFoundException;
+import com.juliobalbino.estoquerefrigerante.exception.SodaStockExceededException;
 import com.juliobalbino.estoquerefrigerante.service.SodaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -172,54 +173,54 @@ public class SodaControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-//    @Test
-//    void whenPATCHIsCalledToIncrementDiscountThenOKStatusIsReturned() throws Exception {
-//        QuantityDTO quantityDTO = QuantityDTO.builder()
-//                .quantity(10)
-//                .build();
-//
-//        SodaDTO sodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
-//        sodaDTO.setQuantity(sodaDTO.getQuantity() + quantityDTO.getQuantity());
-//
-//        when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenReturn(sodaDTO);
-//
-//        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
-//                .contentType(APPLICATION_JSON)
-//                .content(asJsonString(quantityDTO))).andExpect(status().isOk())
-//                .andExpect(jsonPath("$.name", is(sodaDTO.getName())))
-//                .andExpect(jsonPath("$.brand", is(sodaDTO.getBrand())))
-//                .andExpect(jsonPath("$.type", is(sodaDTO.getType().toString())))
-//                .andExpect(jsonPath("$.quantity", is(sodaDTO.getQuantity())));
-//
-//    }
-//
-//    @Test
-//    void whenPATCHIsCalledToIncrementGreatherThanMaxThenBadRequestStatusIsReturned() throws Exception {
-//        QuantityDTO quantityDTO = QuantityDTO.builder()
-//                .quantity(30)
-//                .build();
-//
-//        SodaDTO sodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
-//        sodaDTO.setQuantity(sodaDTO.getQuantity() + quantityDTO.getQuantity());
-//
-//        when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenReturn(sodaDTO);
-//
-//        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
-//                .contentType(APPLICATION_JSON)
-//                .content(asJsonString(quantityDTO))).andExpect(status().isBadRequest());
-//
-//    }
-//
-//    @Test
-//    void whenPATCHIsCalledWithInvalidSodaIdToIncrementThenNotFoundStatusIsReturned() throws Exception {
-//        QuantityDTO quantityDTO = QuantityDTO.builder()
-//                .quantity(30)
-//                .build();
-//
-//                when(sodaService.increment(INVALID_SODA_ID, quantityDTO.getQuantity())).thenThrow(SodaNotFoundException.class);
-//                mockMvc.perform(patch(SODA_API_URL_PATH + "/" + INVALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
-//                .contentType(APPLICATION_JSON)
-//                .content(asJsonString(quantityDTO)))
-//                .andExpect(status().isNotFound());
-//    }
+    @Test
+    void whenPATCHIsCalledToIncrementDiscountThenOKStatusIsReturned() throws Exception {
+        QuantityDTO quantityDTO = QuantityDTO.builder()
+                .quantity(10)
+                .build();
+
+        SodaDTO sodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        sodaDTO.setQuantity(sodaDTO.getQuantity() + quantityDTO.getQuantity());
+
+        when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenReturn(sodaDTO);
+
+        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+                .contentType(APPLICATION_JSON)
+                .content(asJsonString(quantityDTO))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(sodaDTO.getName())))
+                .andExpect(jsonPath("$.brand", is(sodaDTO.getBrand())))
+                .andExpect(jsonPath("$.type", is(sodaDTO.getType().toString())))
+                .andExpect(jsonPath("$.quantity", is(sodaDTO.getQuantity())));
+
+    }
+
+    @Test
+    void whenPATCHIsCalledToIncrementGreatherThanMaxThenBadRequestStatusIsReturned() throws Exception {
+        QuantityDTO quantityDTO = QuantityDTO.builder()
+                .quantity(30)
+                .build();
+
+        SodaDTO sodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        sodaDTO.setQuantity(sodaDTO.getQuantity() + quantityDTO.getQuantity());
+
+        when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenThrow(SodaStockExceededException.class);
+
+        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+                .contentType(APPLICATION_JSON)
+                .content(asJsonString(quantityDTO))).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    void whenPATCHIsCalledWithInvalidSodaIdToIncrementThenNotFoundStatusIsReturned() throws Exception {
+        QuantityDTO quantityDTO = QuantityDTO.builder()
+                .quantity(30)
+                .build();
+
+                when(sodaService.increment(INVALID_SODA_ID, quantityDTO.getQuantity())).thenThrow(SodaNotFoundException.class);
+                mockMvc.perform(patch(SODA_API_URL_PATH + "/" + INVALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+                .contentType(APPLICATION_JSON)
+                .content(asJsonString(quantityDTO)))
+                .andExpect(status().isNotFound());
+    }
 }
