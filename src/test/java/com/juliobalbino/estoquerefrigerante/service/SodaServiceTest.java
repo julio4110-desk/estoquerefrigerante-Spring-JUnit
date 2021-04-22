@@ -178,6 +178,8 @@ public class SodaServiceTest {
 
 
         int quantityToIncrement = 80;
+
+        // then
         assertThrows(SodaStockExceededException.class, () -> sodaService.increment(expectedSodaDTO.getId(), quantityToIncrement));
     }
 
@@ -190,8 +192,9 @@ public class SodaServiceTest {
         // when
         when(sodaRepository.findById(expectedSodaDTO.getId())).thenReturn(Optional.of(expectedSoda));
 
-
         int quantityToIncrement = 45;
+
+        // then
         assertThrows(SodaStockExceededException.class, () -> sodaService.increment(expectedSodaDTO.getId(), quantityToIncrement));
     }
 
@@ -202,5 +205,69 @@ public class SodaServiceTest {
         when(sodaRepository.findById(INVALID_SODA_ID)).thenReturn(Optional.empty());
 
         assertThrows(SodaNotFoundException.class, () -> sodaService.increment(INVALID_SODA_ID, quantityToIncrement));
+    }
+
+    @Test
+    void whenDecrementIsCalledThenDecrementSodaStock() throws SodaNotFoundException, SodaStockExceededException {
+        // given
+        SodaDTO expectedSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedSoda = sodaMapper.toModel(expectedSodaDTO);
+
+        // when
+        when(sodaRepository.findById(expectedSodaDTO.getId())).thenReturn(Optional.of(expectedSoda));
+        when(sodaRepository.save(expectedSoda)).thenReturn(expectedSoda);
+
+        int quantityToDecrement = 5;
+        int expectedQuantityAfterDecrement = expectedSodaDTO.getQuantity() - quantityToDecrement;
+
+        // then
+        SodaDTO decrementedSodaDTO = sodaService.decrement(expectedSodaDTO.getId(), quantityToDecrement);
+
+        assertThat(expectedQuantityAfterDecrement, is(equalTo(decrementedSodaDTO.getQuantity())));
+        assertThat(expectedQuantityAfterDecrement, is(greaterThan(0)));
+    }
+
+    @Test
+    void whenDecrementIsCalledToEmptyStockThenEmptySodaStock() throws SodaNotFoundException, SodaStockExceededException {
+        // given
+        SodaDTO expectedSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedSoda = sodaMapper.toModel(expectedSodaDTO);
+
+        // when
+        when(sodaRepository.findById(expectedSodaDTO.getId())).thenReturn(Optional.of(expectedSoda));
+        when(sodaRepository.save(expectedSoda)).thenReturn(expectedSoda);
+
+        int quantityToDecrement = 10;
+        int expectedQuantityAfterDecrement = expectedSodaDTO.getQuantity() - quantityToDecrement;
+
+        // then
+        SodaDTO decrementedSodaDTO = sodaService.decrement(expectedSodaDTO.getId(), quantityToDecrement);
+
+        assertThat(expectedQuantityAfterDecrement, is(equalTo(0)));
+        assertThat(expectedQuantityAfterDecrement, is(equalTo(decrementedSodaDTO.getQuantity())));
+    }
+
+    @Test
+    void whenDecrementIsLowerThanZeroThenThrowException() {
+        // given
+        SodaDTO expectedSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedSoda = sodaMapper.toModel(expectedSodaDTO);
+
+        // when
+        when(sodaRepository.findById(expectedSodaDTO.getId())).thenReturn(Optional.of(expectedSoda));
+
+        int quantityToDecrement = 80;
+
+        // then
+        assertThrows(SodaStockExceededException.class, () -> sodaService.decrement(expectedSodaDTO.getId(), quantityToDecrement));
+    }
+
+    @Test
+    void whenDecrementIsCalledWithInvalidIdThenThrowException() {
+        int quantityToDecrement = 10;
+
+        when(sodaRepository.findById(INVALID_SODA_ID)).thenReturn(Optional.empty());
+
+        assertThrows(SodaNotFoundException.class, () -> sodaService.decrement(INVALID_SODA_ID, quantityToDecrement));
     }
 }

@@ -71,4 +71,15 @@ public class SodaService {
         }
         throw new SodaStockExceededException(id, quantityToIncrement);
     }
+
+    public SodaDTO decrement(Long id, int quantityToDecrement) throws SodaNotFoundException,  SodaStockExceededException {
+        Soda sodaToDecrementStock = verifyIfIsExists(id);
+        int sodaStockAfterDecremented = sodaToDecrementStock.getQuantity() - quantityToDecrement;
+        if (sodaStockAfterDecremented >=0 ){
+            sodaToDecrementStock.setQuantity(sodaStockAfterDecremented);
+            Soda decrementedSodaStock = sodaRepository.save(sodaToDecrementStock);
+            return sodaMapper.toDTO(decrementedSodaStock);
+        }
+        throw new SodaStockExceededException(id, quantityToDecrement);
+    }
 }
