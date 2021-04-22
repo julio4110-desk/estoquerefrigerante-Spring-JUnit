@@ -4,6 +4,7 @@ import com.juliobalbino.estoquerefrigerante.builder.SodaDTOBuilder;
 import com.juliobalbino.estoquerefrigerante.dto.SodaDTO;
 import com.juliobalbino.estoquerefrigerante.entity.Soda;
 import com.juliobalbino.estoquerefrigerante.exception.SodaAlreadyRegisteredException;
+import com.juliobalbino.estoquerefrigerante.exception.SodaNotFoundException;
 import com.juliobalbino.estoquerefrigerante.mapper.SodaMapper;
 import com.juliobalbino.estoquerefrigerante.repository.SodaRepository;
 import org.junit.jupiter.api.Test;
@@ -62,5 +63,33 @@ public class SodaServiceTest {
 
         // then
         assertThrows(SodaAlreadyRegisteredException.class, () -> sodaService.createSoda(expectedSodaDTO));
+    }
+
+    @Test
+    void whenValidSodaNameIsGivenThenReturnASoda() throws SodaNotFoundException {
+        // given
+        SodaDTO expectedFoundSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+        Soda expectedFoundSoda = sodaMapper.toModel(expectedFoundSodaDTO);
+
+        // when
+        when(sodaRepository.findByName(expectedFoundSoda.getName())).thenReturn(Optional.of(expectedFoundSoda));
+
+        // then
+        SodaDTO foundSodaDTO = sodaService.findByName(expectedFoundSodaDTO.getName());
+
+        assertThat(foundSodaDTO, is(equalTo(expectedFoundSodaDTO)));
+    }
+
+    @Test
+    void whenNoRegisteredSodaNameIsGivenThenThrowException() {
+        // given
+        SodaDTO expectedFoundSodaDTO = SodaDTOBuilder.builder().build().toSodaDTO();
+
+
+        // when
+        when(sodaRepository.findByName(expectedFoundSodaDTO.getName())).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(SodaNotFoundException.class, ()->sodaService.findByName(expectedFoundSodaDTO.getName()));
     }
 }

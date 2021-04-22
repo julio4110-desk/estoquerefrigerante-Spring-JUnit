@@ -23,6 +23,7 @@ import java.util.Collections;
 import static com.juliobalbino.estoquerefrigerante.utils.JsonConvertionUtils.asJsonString;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,7 +94,7 @@ public class SodaControllerTest {
         when(sodaService.findByName(sodaDTO.getName())).thenReturn(sodaDTO);
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.get(SODA_API_URL_PATH + "/" + sodaDTO.getName())
+        mockMvc.perform(get(SODA_API_URL_PATH + "/" + sodaDTO.getName())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(sodaDTO.getName())))
@@ -110,7 +111,7 @@ public class SodaControllerTest {
         when(sodaService.findByName(sodaDTO.getName())).thenThrow(SodaNotFoundException.class);
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.get(SODA_API_URL_PATH + "/" + sodaDTO.getName())
+        mockMvc.perform(get(SODA_API_URL_PATH + "/" + sodaDTO.getName())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -124,7 +125,7 @@ public class SodaControllerTest {
         when(sodaService.listAll()).thenReturn(Collections.singletonList(sodaDTO));
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.get(SODA_API_URL_PATH)
+        mockMvc.perform(get(SODA_API_URL_PATH)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is(sodaDTO.getName())))
@@ -141,7 +142,7 @@ public class SodaControllerTest {
         when(sodaService.listAll()).thenReturn(Collections.singletonList(sodaDTO));
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.get(SODA_API_URL_PATH)
+        mockMvc.perform(get(SODA_API_URL_PATH)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -154,7 +155,7 @@ public class SodaControllerTest {
         doNothing().when(sodaService).deleteById(sodaDTO.getId());
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.delete(SODA_API_URL_PATH + "/" + sodaDTO.getId())
+        mockMvc.perform(delete(SODA_API_URL_PATH + "/" + sodaDTO.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -165,7 +166,7 @@ public class SodaControllerTest {
         doThrow(SodaNotFoundException.class).when(sodaService).deleteById(INVALID_SODA_ID);
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.delete(SODA_API_URL_PATH + "/" + INVALID_SODA_ID)
+        mockMvc.perform(delete(SODA_API_URL_PATH + "/" + INVALID_SODA_ID)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -181,7 +182,7 @@ public class SodaControllerTest {
 
         when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenReturn(sodaDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(quantityDTO))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(sodaDTO.getName())))
@@ -202,7 +203,7 @@ public class SodaControllerTest {
 
         when(sodaService.increment(VALID_SODA_ID, quantityDTO.getQuantity())).thenReturn(sodaDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+        mockMvc.perform(patch(SODA_API_URL_PATH + "/" + VALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(quantityDTO))).andExpect(status().isBadRequest());
 
@@ -215,7 +216,7 @@ public class SodaControllerTest {
                 .build();
 
                 when(sodaService.increment(INVALID_SODA_ID, quantityDTO.getQuantity())).thenThrow(SodaNotFoundException.class);
-                mockMvc.perform(MockMvcRequestBuilders.patch(SODA_API_URL_PATH + "/" + INVALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
+                mockMvc.perform(patch(SODA_API_URL_PATH + "/" + INVALID_SODA_ID + SODA_API_SUBPATH_INCREMENT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(quantityDTO)))
                 .andExpect(status().isNotFound());
